@@ -8,12 +8,12 @@ import time
 import csv
 
 
-# file = open("informations.csv", "w")
+file = open("informations.csv", "w")
 
-# csv_file = csv.writer(file)
-# csv_file.writerow([
-#     '昵称', '主页', '头像', '平台', '联系方式', '粉丝数', '线上报价', '线下报价', '所在地',
-#     '标签', '直播间', '简介'])
+csv_file = csv.writer(file)
+csv_file.writerow([
+    '昵称', '主页', '头像', '平台', '联系方式', '粉丝数', '线上报价', '线下报价', '所在地',
+    '标签', '直播间', '简介'])
 
 
 def fetch_info(start_url, index_url):
@@ -64,7 +64,6 @@ def fetch_info(start_url, index_url):
                         "\n", "").replace("\t", "").replace("\r", "")
                 except:
                     nickname = ""
-                print('1.Nickname:', nickname)
 
                 try:
                     profile_url = top_section.find("a")['href']
@@ -96,18 +95,18 @@ def fetch_info(start_url, index_url):
                         'div', class_="live-col").find(
                         'div', class_="col-list")
 
-                    # try:
-                    #     avatar_url = basic_section.find(
-                    #         'div', class_="avatar").find("img")['src']
-                    # except:
-                    #     avatar_url = ""
+                    try:
+                        avatar_url = basic_section.find(
+                            'div', class_="avatar").find("img")['src']
+                    except:
+                        avatar_url = ""
 
-                    # try:
-                    #     platname = basic_section.find(
-                    #         'div', class_="motto").get_text().strip().replace(
-                    #         "\n", "").replace("\t", "").replace("\r", "")
-                    # except:
-                    #     platname = ""
+                    try:
+                        platname = basic_section.find(
+                            'div', class_="motto").get_text().strip().replace(
+                            "\n", "").replace("\t", "").replace("\r", "")
+                    except:
+                        platname = ""
 
                     # need login to fetch contacts
                     try:
@@ -116,75 +115,78 @@ def fetch_info(start_url, index_url):
                             "\n", "").replace("\t", "").replace("\r", "")
                     except:
                         contacts = ""
-                    print('5.Contacts:', contacts)
+
+                    # fetch ajax follower data
+                    driver = webdriver.PhantomJS(
+                        executable_path='../phantomjs/bin/phantomjs')
+                    driver.get(profile_url)
+                    time.sleep(1)
+
+                    try:
+                        follower_count = driver.find_element_by_class_name(
+                            'user-info').find_element_by_xpath(
+                            "//span[@id='v_follower']").text
+                    except:
+                        follower_count = ''
 
                     infos = info_section.findAll('li')
-                    print('>>>>>>666666666', infos[1])
                     try:
-                        follower_count = infos[1].find(
+                        prize_on = infos[4].find(
                             'span').get_text().strip().replace(
                             "\n", "").replace("\t", "").replace("\r", "")
                     except:
-                        follower_count = ''
-                    print('6.Followers:', follower_count)
+                        prize_on = ''
 
-                    # try:
-                    #     prize_on = infos[4].find(
-                    #         'span').get_text().strip().replace(
-                    #         "\n", "").replace("\t", "").replace("\r", "")
-                    # except:
-                    #     prize_on = ''
+                    try:
+                        prize_off = infos[5].find(
+                            'span').get_text().strip().replace(
+                            "\n", "").replace("\t", "").replace("\r", "")
+                    except:
+                        prize_off = ''
 
-                    # try:
-                    #     prize_off = infos[5].find(
-                    #         'span').get_text().strip().replace(
-                    #         "\n", "").replace("\t", "").replace("\r", "")
-                    # except:
-                    #     prize_off = ''
+                    try:
+                        location = infos[3].find(
+                            'span').get_text().strip().replace(
+                            "\n", "").replace("\t", "").replace("\r", "")
+                    except:
+                        location = ''
 
-                    # try:
-                    #     location = infos[3].find(
-                    #         'span').get_text().strip().replace(
-                    #         "\n", "").replace("\t", "").replace("\r", "")
-                    # except:
-                    #     location = ''
+                    tags = []
+                    tags_section = infos[6].findAll('a')
+                    for ts in tags_section:
+                        try:
+                            tag = ts.get_text().strip().replace(
+                                "\n", "").replace("\t", "").replace("\r", "")
+                        except:
+                            tag = ''
+                        if tag:
+                            tags.append(tag)
 
-                    # tags = []
-                    # tags_section = infos[6].findAll('a')
-                    # for ts in tags_section:
-                    #     try:
-                    #         tag = ts.get_text().strip().replace(
-                    #             "\n", "").replace("\t", "").replace("\r", "")
-                    #     except:
-                    #         tag = ''
-                    #     if tag:
-                    #         tags.append(tag)
+                    try:
+                        platform_url = infos[7].find(
+                            'span').get_text().strip().replace(
+                            "\n", "").replace("\t", "").replace("\r", "")
+                    except:
+                        platform_url = ''
 
-                    # try:
-                    #     platform_url = infos[7].find(
-                    #         'span').get_text().strip().replace(
-                    #         "\n", "").replace("\t", "").replace("\r", "")
-                    # except:
-                    #     platform_url = ''
+                    intro = ''
+                    intro_lines = intro_section.findAll('p')
+                    for intro_line in intro_lines:
+                        try:
+                            context = intro_line.find(
+                                'span').get_text().strip().replace(
+                                "\n", "").replace("\t", "").replace("\r", "")
+                        except:
+                            context = ''
+                        if context:
+                            intro += context
 
-                    # intro = ''
-                    # intro_lines = intro_section.findAll('p')
-                    # for intro_line in intro_lines:
-                    #     try:
-                    #         context = intro_line.find(
-                    #             'span').get_text().strip().replace(
-                    #             "\n", "").replace("\t", "").replace("\r", "")
-                    #     except:
-                    #         context = ''
-                    #     if context:
-                    #         intro += context
+                    csv_file.writerow([
+                        nickname, profile_url, avatar_url, platname, contacts,
+                        follower_count, prize_on, prize_off, location, tags,
+                        platform_url, intro])
 
-                    # csv_file.writerow([
-                    #     nickname, profile_url, avatar_url, platname, contacts,
-                    #     follower_count, prize_on, prize_off, location, tags,
-                    #     platform_url, intro])
-
-                # time.sleep(stop)
+                time.sleep(stop)
 
             except:
                 error = "爬取第%d页的第%d条信息失败，网址为%s" % (i, counts + 1, url)
@@ -199,4 +201,4 @@ if __name__ == '__main__':
     print('Done!')
 
 
-# file.close()
+file.close()
