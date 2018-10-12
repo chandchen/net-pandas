@@ -55,6 +55,10 @@ class Authentication:
 
 def fetch_info(start_url, index_url):
 
+    total_count = 0
+    success_count = 0
+    failed_count = 0
+
     # req0 = urllib.request.Request(start_url)
     # req0.add_header(
     #     "User-Agent",
@@ -107,6 +111,7 @@ def fetch_info(start_url, index_url):
 
                 ss = "正在爬取第%d页的第%d条信息，网址为%s" % (i, counts + 1, profile_url)
                 print(ss)
+                total_count += 1
 
                 # Get Profile Detail Informations
                 if profile_url is not None:
@@ -114,7 +119,7 @@ def fetch_info(start_url, index_url):
                     # profile_req.add_header(
                     #     "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
                     #     (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
-                    # profile_html = urllib.request.urlopen(profile_req).read()
+                    # detail_html = urllib.request.urlopen(profile_req).read()
                     detail_html = sessions.get(
                         profile_url, headers=headers).text
                     detail_soup = BeautifulSoup(
@@ -156,7 +161,7 @@ def fetch_info(start_url, index_url):
                     # fetch ajax follower data
                     # NOTE: change executable_path to your local path
                     driver = webdriver.PhantomJS(
-                        executable_path='/usr/bin/phantomjs')
+                        executable_path='../phantomjs/bin/phantomjs')
                     driver.get(profile_url)
                     time.sleep(1)
 
@@ -223,13 +228,17 @@ def fetch_info(start_url, index_url):
                         nickname, profile_url, avatar_url, platname, contacts,
                         follower_count, prize_on, prize_off, location, tags,
                         platform_url, intro])
+                    success_count += 1
 
                 time.sleep(stop)
 
             except:
                 error = "爬取第%d页的第%d条信息失败，网址为%s" % (i, counts + 1, url)
                 print(error)
+                failed_count += 1
                 pass
+    print('总共爬取{}条数据({}成功/{}失败)'.format(
+        total_count, success_count, failed_count))
 
 
 if __name__ == '__main__':
@@ -241,7 +250,6 @@ if __name__ == '__main__':
     start_url = "http://www.zhaihehe.com/?/authentication_anchor/0/&p=1"
     index_url = "http://www.zhaihehe.com/?/authentication_anchor/0/&p="
     fetch_info(start_url, index_url)
-    print('Done!')
 
 
 file.close()
