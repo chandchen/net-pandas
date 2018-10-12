@@ -1,42 +1,75 @@
 # -*- coding: utf-8 -*-
 import urllib
 import urllib.request
-from bs4 import BeautifulSoup
-from selenium import webdriver
 import random
 import time
 import csv
+import requests
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
 
 
-file = open("informations.csv", "w")
+file = open("robots_data.csv", "w")
 
 csv_file = csv.writer(file)
 csv_file.writerow([
     '昵称', '主页', '头像', '平台', '联系方式', '粉丝数', '线上报价', '线下报价', '所在地',
     '标签', '直播间', '简介'])
 
+sessions = requests.Session()
+
+
+class Authentication:
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.login_url = 'http://www.zhaihehe.com/?/n_login/0'
+        self.headers = {
+            'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) \
+                          AppleWebKit/537.36 (KHTML, like Gecko) \
+                          Chrome/59.0.3071.115 Safari/537.36",
+            'Referer': 'http://www.zhaihehe.com/?/member_n/4228'
+        }
+
+    def login(self):
+        data = {
+            'loginname': self.username,
+            'password': self.password,
+            'submit': '登 录'
+        }
+        r = sessions.post(self.login_url, data=data)
+        if r.status_code == 200:
+            print('登陆成功！')
+        else:
+            print('登陆失败！')
+        # self.headers['Referer'] = 'http://www.zhaihehe.com/?/n_login/0'
+        # resp = sessions.get(
+        #     'http://www.zhaihehe.com/?/authentication_anchor_detail/2273394',
+        #     headers=self.headers)
+
+        # soup0 = BeautifulSoup(resp.text, features="html.parser")
+        # print(soup0)
+
 
 def fetch_info(start_url, index_url):
-    # user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36"
-    # cookie = "uid=f0b5BQRRUVRTB1JVBAMGAAMGBwUAA1VWUFRdBVNWUVEK; ushell=6774BVJTBlUIAgYHB1oHV1sMWwMCXAFdUgFQVlMIW1UGAwFWBgcABwhRDwMAXgIIVVwABAsBBQlVUQAHAA"
-    # headers = {"User-Agent": user_agent, "Cookie": cookie}
 
-    req0 = urllib.request.Request(start_url)
-
-    req0.add_header(
-        "User-Agent",
-        "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
-        (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
-
-    # # Local Login Config
-    # # req0.add_header(
-    # #     "User-Agent",
-    # #     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36")
+    # req0 = urllib.request.Request(start_url)
     # req0.add_header(
-    #     "Cookie",
-    #     "uid=f0b5BQRRUVRTB1JVBAMGAAMGBwUAA1VWUFRdBVNWUVEK; ushell=6774BVJTBlUIAgYHB1oHV1sMWwMCXAFdUgFQVlMIW1UGAwFWBgcABwhRDwMAXgIIVVwABAsBBQlVUQAHAA")
+    #     "User-Agent",
+    #     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
+    #     (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
 
-    html0 = urllib.request.urlopen(req0).read()
+    headers = {
+        'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) \
+                      AppleWebKit/537.36 (KHTML, like Gecko) \
+                      Chrome/59.0.3071.115 Safari/537.36",
+        'Referer': 'http://www.zhaihehe.com/?/n_login/0'
+    }
+
+    # html0 = urllib.request.urlopen(req0).read()
+    html0 = sessions.get(start_url, headers=headers).text
     soup0 = BeautifulSoup(html0, features="html.parser")
 
     # total_page = int(soup0.find('li', id='Page_End').find(
@@ -46,12 +79,14 @@ def fetch_info(start_url, index_url):
     for i in list(range(1, total_page + 1)):
         stop = random.uniform(1, 3)
         url = index_url + str(i)
-        req = urllib.request.Request(url)
-        req.add_header(
-            "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
-            (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
-        html = urllib.request.urlopen(req).read()
+        # req = urllib.request.Request(url)
+        # req.add_header(
+        #     "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
+        #     (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
+        # html = urllib.request.urlopen(req).read()
+        html = sessions.get(url, headers=headers).text
         soup = BeautifulSoup(html, features="html.parser")
+
         contents = soup.find('div', class_="index_anchor").findAll(
             'div', class_="index_anchor-25")
 
@@ -75,21 +110,23 @@ def fetch_info(start_url, index_url):
 
                 # Get Profile Detail Informations
                 if profile_url is not None:
-                    profile_req = urllib.request.Request(profile_url)
-                    profile_req.add_header(
-                        "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
-                        (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
-                    profile_html = urllib.request.urlopen(profile_req).read()
-                    profile_soup = BeautifulSoup(profile_html, features="html.parser")
-                    profile_detail = profile_soup.find(
-                        'div', class_="user-content")
+                    # profile_req = urllib.request.Request(profile_url)
+                    # profile_req.add_header(
+                    #     "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
+                    #     (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
+                    # profile_html = urllib.request.urlopen(profile_req).read()
+                    detail_html = sessions.get(
+                        profile_url, headers=headers).text
+                    detail_soup = BeautifulSoup(
+                        detail_html, features="html.parser")
+                    detail = detail_soup.find('div', class_="user-content")
 
-                    basic_section = profile_detail.find('div', class_="user-basic")
-                    info_section = profile_detail.find('div', class_="user-info")
-                    contact_section = profile_detail.find(
+                    basic_section = detail.find('div', class_="user-basic")
+                    info_section = detail.find('div', class_="user-info")
+                    contact_section = detail.find(
                         'div', class_="clickin-wrapper")
 
-                    intro_section = profile_soup.find(
+                    intro_section = detail_soup.find(
                         'div', class_="container").find(
                         'div', class_="content").find(
                         'div', class_="live-col").find(
@@ -195,6 +232,11 @@ def fetch_info(start_url, index_url):
 
 
 if __name__ == '__main__':
+    username = input('请输入账号：')
+    password = input('请输入密码：')
+    cs = Authentication(username, password)
+    cs.login()
+
     start_url = "http://www.zhaihehe.com/?/authentication_anchor/0/&p=1"
     index_url = "http://www.zhaihehe.com/?/authentication_anchor/0/&p="
     fetch_info(start_url, index_url)
