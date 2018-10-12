@@ -1,7 +1,12 @@
 beautifulsoup4==4.6.3
 certifi==2018.8.24
 chardet==3.0.4
+cssselect==1.0.3
 idna==2.7
+lxml==4.2.5
+parsel==1.5.0
 requests==2.19.1
 selenium==2.48.0
+six==1.11.0
 urllib3==1.23
+w3lib==1.19.0
