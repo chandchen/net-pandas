@@ -72,9 +72,9 @@ def fetch_info(start_url, index_url):
     html0 = sessions.get(start_url, headers=headers).text
     soup0 = BeautifulSoup(html0, features="html.parser")
 
-    # total_page = int(soup0.find('li', id='Page_End').find(
-    #     "a")['href'].split('=')[-1])
-    total_page = 1
+    total_page = int(soup0.find('li', id='Page_End').find(
+        "a")['href'].split('=')[-1])
+    # total_page = 1
 
     for i in list(range(1, total_page + 1)):
         stop = random.uniform(1, 3)
@@ -154,8 +154,9 @@ def fetch_info(start_url, index_url):
                         contacts = ""
 
                     # fetch ajax follower data
+                    # NOTE: change executable_path to your local path
                     driver = webdriver.PhantomJS(
-                        executable_path='../phantomjs/bin/phantomjs')
+                        executable_path='/usr/bin/phantomjs')
                     driver.get(profile_url)
                     time.sleep(1)
 
