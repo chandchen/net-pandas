@@ -50,23 +50,45 @@ def fetch_info(uid):
     url = "https://www.douyin.com/share/user/%s" % uid
     body = fetch_data(url)
     xbody = Selector(text=body)
-    item = dict()
+    # item = dict()
 
-    nickname = xbody.xpath("//p[@class='nickname']/text()").extract_first()
+    try:
+        error_msg = xbody.xpath(
+            "//div[@class='error-text']/p/text()").extract_first()
+    except Exception as e:
+        error_msg = ''
+    if error_msg == '页面不见啦~':
+        print('----------用户不存在！----------')
+        return
 
-    entry_count = xbody.xpath(
-        "//div[@class='user-tab active tab get-list']/span").extract_first()
-    entry_count = re.findall(r'>([\s\S]+?)<', entry_count)
-    entry_count = jiexi(entry_count).strip()
+    try:
+        nickname = xbody.xpath(
+            "//p[@class='nickname']/text()").extract_first()
+    except:
+        nickname = ''
 
-    entry_likes = xbody.xpath(
-        "//div[@class='like-tab tab get-list']/span").extract_first()
-    entry_likes = re.findall(r'>([\s\S]+?)<', entry_likes)
-    entry_likes = jiexi(entry_likes).strip()
+    try:
+        entry_count = xbody.xpath(
+            "//div[@class='user-tab active tab get-list']/span").extract_first()
+        entry_count = re.findall(r'>([\s\S]+?)<', entry_count)
+        entry_count = jiexi(entry_count).strip()
+    except:
+        entry_count = ''
 
-    douyin_id = xbody.xpath("//p[@class='shortid']").extract_first()
-    douyin_id = re.findall(r'>([\s\S]+?)<', douyin_id)
-    douyin_id = jiexi(douyin_id).replace(u"抖音ID：", '').strip()
+    try:
+        entry_likes = xbody.xpath(
+            "//div[@class='like-tab tab get-list']/span").extract_first()
+        entry_likes = re.findall(r'>([\s\S]+?)<', entry_likes)
+        entry_likes = jiexi(entry_likes).strip()
+    except:
+        entry_likes = ''
+
+    try:
+        douyin_id = xbody.xpath("//p[@class='shortid']").extract_first()
+        douyin_id = re.findall(r'>([\s\S]+?)<', douyin_id)
+        douyin_id = jiexi(douyin_id).replace(u"抖音ID：", '').strip()
+    except:
+        douyin_id = ''
 
     try:
         verify_info = xbody.xpath(
@@ -74,27 +96,42 @@ def fetch_info(uid):
     except Exception as e:
         verify_info = ''
 
-    following = xbody.xpath(
-        "//span[contains(@class,'focus block')]/span[@class='num']")\
-        .extract_first()
-    following = re.findall(r'>([\s\S]+?)<', following)
-    following = jiexi(following)
+    try:
+        following = xbody.xpath(
+            "//span[contains(@class,'focus block')]/span[@class='num']")\
+            .extract_first()
+        following = re.findall(r'>([\s\S]+?)<', following)
+        following = jiexi(following)
+    except:
+        following = ''
 
-    follower = xbody.xpath(
-        "//span[contains(@class,'follower block')]/span[@class='num']")\
-        .extract_first()
-    follower = re.findall(r'>([\s\S]+?)<', follower)
-    follower = jiexi(follower)
+    try:
+        follower = xbody.xpath(
+            "//span[contains(@class,'follower block')]/span[@class='num']")\
+            .extract_first()
+        follower = re.findall(r'>([\s\S]+?)<', follower)
+        follower = jiexi(follower)
+    except:
+        follower = ''
 
-    like_count = xbody.xpath(
-        "//span[contains(@class,'liked-num block')]/span[@class='num']")\
-        .extract_first()
-    like_count = re.findall(r'>([\s\S]+?)<', like_count)
-    like_count = jiexi(like_count)
+    try:
+        like_count = xbody.xpath(
+            "//span[contains(@class,'liked-num block')]/span[@class='num']")\
+            .extract_first()
+        like_count = re.findall(r'>([\s\S]+?)<', like_count)
+        like_count = jiexi(like_count)
+    except:
+        like_count = ''
 
-    intro = xbody.xpath("//p[@class='signature']/text()").extract_first()
+    try:
+        intro = xbody.xpath("//p[@class='signature']/text()").extract_first()
+    except:
+        intro = ''
 
-    avatar = xbody.xpath("//img[@class='avatar']/@src").extract_first()
+    try:
+        avatar = xbody.xpath("//img[@class='avatar']/@src").extract_first()
+    except:
+        avatar = ''
 
     try:
         location = xbody.xpath(
@@ -122,10 +159,11 @@ def fetch_info(uid):
     # item['constellation'] = constellation
     # pprint(item)
 
-    csv_file.writerow([
-        nickname, douyin_id, avatar, verify_info, intro, location,
-        constellation, following, follower, like_count, entry_count,
-        entry_likes])
+    if douyin_id:
+        csv_file.writerow([
+            nickname, douyin_id, avatar, verify_info, intro, location,
+            constellation, following, follower, like_count, entry_count,
+            entry_likes])
 
 
 def jiexi(lists):
@@ -181,7 +219,11 @@ if __name__ == '__main__':
         "77267568314", "52616983119", "61141281259", "58900737309"
     ]
     # uids = ["84990209480"]
-    for uid in uids:
-        fetch_info(uid)
+    # for uid in uids:
+    #     fetch_info(uid)
+
+    for i in list(range(1, 100)):
+        fetch_info(i)
+    # fetch_info(50)
 
 file.close()
