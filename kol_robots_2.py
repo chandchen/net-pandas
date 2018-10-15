@@ -71,11 +71,6 @@ def fetch_info(start_url, index_url):
     for i in list(range(1, total_page + 1)):
         stop = random.uniform(1, 3)
         url = index_url + str(i)
-        # req = urllib.request.Request(url)
-        # req.add_header(
-        #     "User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 \
-        #     (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
-        # html = urllib.request.urlopen(req).read()
         html = sessions.get(url, headers=headers).text
         soup = BeautifulSoup(html, features="html.parser")
 
@@ -93,18 +88,31 @@ def download_info():
     }
     # download_url = "https://kolranking.com/home?order=follower_count&ot=\
     #                 DESC&page=1&type=download"
-    for i in list(range(1, 6)):
+    for i in list(range(1, 5001)):
         url = "https://kolranking.com/home?order=follower_count&ot=\
                DESC&page={}&type=download".format(i)
-        target = sessions.get(url, headers=headers)
         file_name = "kol_demo/demo_page_{}.xlsx".format(i)
-        with open(file_name, "wb") as code:
-            code.write(target.content)
+        try:
+            target = sessions.get(url, headers=headers)
+            with open(file_name, "wb") as code:
+                code.write(target.content)
+            data = xlrd.open_workbook(file_name).sheets()[0]
+            for c in list(range(1, 11)):
+                print('正在获取第{}页的第{}条数据'.format(i, c))
+                csv_file.writerow(data.row_values(c))
+        except:
+            sign = input('type yes or no to contine: ')
 
-        data = xlrd.open_workbook(file_name).sheets()[0]
-        for c in list(range(1, 11)):
-            print('正在获取第{}页的第{}条数据'.format(i, c))
-            csv_file.writerow(data.row_values(c))
+            if sign == 'yes':
+                target = sessions.get(url, headers=headers)
+                with open(file_name, "wb") as code:
+                    code.write(target.content)
+                data = xlrd.open_workbook(file_name).sheets()[0]
+                for c in list(range(1, 11)):
+                    print('正在获取第{}页的第{}条数据'.format(i, c))
+                    csv_file.writerow(data.row_values(c))
+            else:
+                break
 
 
 if __name__ == '__main__':
