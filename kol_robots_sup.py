@@ -6,6 +6,7 @@ import xlrd
 import os
 
 from bs4 import BeautifulSoup
+from playsound import playsound
 
 
 headers = {
@@ -80,6 +81,7 @@ def download_user_info(top, bottom):
                 print('正在获取第{}页的第{}条数据'.format(i, c))
                 csv_file.writerow(data.row_values(c))
         except:
+            playsound('sounds/704.wav')
             sign = input('请打开网页进行验证(Y/N):')
 
             if sign == 'y':
