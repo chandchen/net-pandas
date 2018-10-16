@@ -7,13 +7,17 @@ import csv
 import requests
 import json
 import xlrd
+import pytesseract
+import string
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from parsel import Selector
+from PIL import Image
+from io import BytesIO
 
 
-file = open("kol_data.csv", "w")
+file = open("kol_data/kol_data_category_10.csv", "w")
 
 csv_file = csv.writer(file)
 csv_file.writerow([
@@ -164,9 +168,9 @@ def download_category_specified():
                       Chrome/59.0.3071.115 Safari/537.36",
         'Referer': 'https://kolranking.com/settings/account'
     }
-    for i in list(range(1, 11)):
+    for i in list(range(1, 23)):
         url = category_url + "?order=follower_count&ot=DESC&page={}&type=download".format(i)
-        file_name = "kol_demo/category/demo_category_{}_page_{}.xlsx".format(category_id, i)
+        file_name = "kol_demo/category_{}/demo_category_{}_page_{}.xlsx".format(category_id, category_id, i)
 
         try:
             target = sessions.get(url, headers=headers)
@@ -174,8 +178,12 @@ def download_category_specified():
                 code.write(target.content)
             data = xlrd.open_workbook(file_name).sheets()[0]
             for c in list(range(1, 11)):
-                print('正在获取第{}页的第{}条数据'.format(i, c))
-                csv_file.writerow(data.row_values(c))
+                try:
+                    print('正在获取第{}页的第{}条数据'.format(i, c))
+                    csv_file.writerow(data.row_values(c))
+                except:
+                    print('获取第{}页的第{}条数据失败！'.format(i, c))
+                    break
         except:
             sign = input('type yes or no to contine: ')
 
@@ -185,10 +193,41 @@ def download_category_specified():
                     code.write(target.content)
                 data = xlrd.open_workbook(file_name).sheets()[0]
                 for c in list(range(1, 11)):
-                    print('正在获取第{}页的第{}条数据'.format(i, c))
-                    csv_file.writerow(data.row_values(c))
+                    try:
+                        print('正在获取第{}页的第{}条数据'.format(i, c))
+                        csv_file.writerow(data.row_values(c))
+                    except:
+                        print('获取第{}页的第{}条数据失败！'.format(i, c))
+                        break
             else:
                 break
+
+
+def extract_image(image_file):
+    # tree = lxml.html.fromstring(html)
+    # img_data = tree.cssselect('div#recaptcha img')[0].get('src')
+    # img_data = img_data.partition(',')[-1]
+    # #open('test_.png', 'wb').write(data.decode('base64'))
+    # ##进行base64解码，回到最初的二进制
+    # binary_img_data = img_data.decode('base64')
+    # ##要想加载该图片，PIL需要对一个类似文件的接口，在传给Image类，我们又使用ByteIO对这个二进制进行封装
+    # file_like = BytesIO(binary_img_data)
+    img0 = Image.open(image_file)
+    return img0
+
+
+def ocr(img):
+    # threshold the image to ignore background and keep text
+    # img.save('capcha_originl.png')
+    gray = img.convert('L')
+    # gray.save('captcha_greyscale.png')
+    bw = gray.point(lambda x: 0 if x < 1 else 255, '1')
+    # bw.save('captcha_threshold.png')
+    # print bw
+    word = pytesseract.image_to_string(bw)
+    ascii_word = ''.join(c for c in word if c in string.letters).lower()
+    print(ascii_word)
+    return ascii_word
 
 
 if __name__ == '__main__':
@@ -210,5 +249,9 @@ if __name__ == '__main__':
 
     # download_info()
     download_category_specified()
+    # image = "./default.png"
+
+    # img_data = extract_image(image)
+    # captcha = ocr(img_data)
 
 file.close()

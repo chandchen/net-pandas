@@ -10,6 +10,8 @@
 
 - change `executable_path` to your phantomjs local path, `/usr/bin/phantomjs`
 
+- `pytesseract` require `tesseract-ocr` -> `sudo apt-get install tesseract-ocr`
+
 ### Basic Installation
 
 - `git clone git@github.com:chandchen/web-robots.git`
