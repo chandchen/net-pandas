@@ -2,6 +2,8 @@
 
 **Crawler Target:** http://www.zhaihehe.com/?/authentication_anchor/0
 
+**Crawler Target:** https://kolranking.com/
+
 ### Prerequisites
 
 **PhantomJS:** this allow WebDriver to fetch ajax data in the website
