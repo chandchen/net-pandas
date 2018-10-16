@@ -57,7 +57,8 @@ class Authentication:
 
 
 def download_user_info(top, bottom):
-    file = open("data_collection/kol_ranking_data.csv", "w")
+    file = open("data_collection/kol_ranking_{}_{}.csv".format(
+        top, bottom - 1), "w")
 
     csv_file = csv.writer(file)
     csv_file.writerow(csv_readers)
