@@ -57,6 +57,35 @@ class Authentication:
             print('登陆失败！')
 
 
+def fetch_data(url, file_name, csv_file, i):
+    target = sessions.get(url, headers=headers)
+    with open(file_name, "wb") as code:
+        code.write(target.content)
+    data = xlrd.open_workbook(file_name).sheets()[0]
+    for c in list(range(1, 11)):
+        try:
+            print('正在获取第{}页的第{}条数据'.format(i, c))
+            csv_file.writerow(data.row_values(c))
+        except Exception as e:
+            print('获取第{}页的第{}条数据失败！'.format(i, c))
+            break
+    return
+
+
+def refetch_data(url, file_name, csv_file, i):
+    flag = False
+    # playsound('sounds/704.wav')
+    sign = input('请打开网页进行验证(Y/N):')
+
+    if sign == 'y':
+        try:
+            fetch_data(url, file_name, csv_file, i)
+            flag = True
+        except Exception as e:
+            refetch_data(url, file_name, csv_file, i)
+    return flag
+
+
 def download_user_info(top, bottom):
     file = open("data_collection/kol_ranking_{}_{}.csv".format(
         top, bottom - 1), "w")
@@ -73,31 +102,12 @@ def download_user_info(top, bottom):
 
         file_name = dirlis_new + "/kol_demo_page_{}.xlsx".format(i)
         try:
-            target = sessions.get(url, headers=headers)
-            with open(file_name, "wb") as code:
-                code.write(target.content)
-            data = xlrd.open_workbook(file_name).sheets()[0]
-            for c in list(range(1, 11)):
-                print('正在获取第{}页的第{}条数据'.format(i, c))
-                csv_file.writerow(data.row_values(c))
-        except:
-            playsound('sounds/704.wav')
-            sign = input('请打开网页进行验证(Y/N):')
-
-            if sign == 'y':
-                target = sessions.get(url, headers=headers)
-                with open(file_name, "wb") as code:
-                    code.write(target.content)
-                data = xlrd.open_workbook(file_name).sheets()[0]
-                for c in list(range(1, 11)):
-                    try:
-                        print('正在获取第{}页的第{}条数据'.format(i, c))
-                        csv_file.writerow(data.row_values(c))
-                    except:
-                        print('获取第{}页的第{}条数据失败！'.format(i, c))
-                        break
-            else:
-                break
+            fetch_data(url, file_name, csv_file, i)
+        except Exception as e:
+            success = refetch_data(url, file_name, csv_file, i)
+            if not success:
+                print('验证信息失败！')
+                return
     file.close()
 
 
@@ -105,7 +115,7 @@ if __name__ == '__main__':
     try:
         email = account_info['email']
         password = account_info['password']
-    except:
+    except Exception as e:
         email = input('请输入邮箱：')
         password = input('请输入密码：')
     cs = Authentication(email, password)
