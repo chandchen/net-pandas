@@ -223,9 +223,8 @@ def webdriver_login(driver, account, passwd):
             pass
 
         try:
-            time = content.find_elements_by_xpath(
-                '//time[@class="note-timestamp"]').find_elements_by_xpath(
-                'time').text
+            time = content.find_element_by_tag_name(
+                'time').get_attribute('data-original-title')
             print(time)
         except:
             pass
