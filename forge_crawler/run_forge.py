@@ -137,35 +137,73 @@ def fetch_user_issue_list(state, assignee, author='', milestone='', label=''):
 
 def update_forge_data(driver, url):
     driver.get(url)
-    driver.implicitly_wait(100)
+    driver.implicitly_wait(10)
+    print(url)
 
-    WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((
-            By.XPATH, '//*[@id="notes-list"]')))
+    # WebDriverWait(driver, 100).until(
+    #     EC.presence_of_element_located((
+    #         By.XPATH, '//*[@id="notes-list"]')))
+    headers = driver.find_element_by_class_name('detail-page-header-body')
+    status1 = headers.find_element_by_class_name(
+        'status-box-issue-closed').text
+    status2 = headers.find_element_by_class_name(
+        'status-box-open').text
+    status = status1 if status1 else status2
+    print(status)
 
-    ul = driver.find_element_by_id('notes-list')
-    contents = ul.find_elements_by_xpath('li')
-    for content in contents:
-        try:
-            username = content.find_element_by_class_name(
-                'note-headline-light').text
-            print(username)
-        except:
-            pass
+    created = headers.find_element_by_tag_name(
+        'time').get_attribute('data-original-title')
+    print(created)
 
-        try:
-            action = content.find_element_by_class_name(
-                'system-note-message').find_element_by_xpath('span').text
-            print(action)
-        except:
-            pass
+    author = headers.find_element_by_class_name('author').text
+    print(author)
 
-        try:
-            datetime = content.find_element_by_tag_name(
-                'time').get_attribute('data-original-title')
-            print(datetime)
-        except:
-            pass
+    title = driver.find_element_by_class_name(
+        'detail-page-description').find_element_by_class_name(
+        'title-container').text
+    print(title)
+
+    sidebar = driver.find_element_by_class_name('issuable-context-form')
+
+    assignee = sidebar.find_element_by_class_name(
+        'username').text.replace('@', '')
+    print(assignee)
+
+    milestone = sidebar.find_element_by_class_name(
+        'milestone').text.strip().replace("\n", "").replace("\t", "").replace(
+        "\r", "").replace('Milestone', '').replace('Edit', '')
+    print(milestone)
+
+    labels = sidebar.find_element_by_class_name(
+        'issuable-show-labels').find_elements_by_tag_name('span')
+    for label in labels:
+        print(label.text)
+    # print(labels)
+
+
+    # ul = driver.find_element_by_id('notes-list')
+    # contents = ul.find_elements_by_xpath('li')
+    # for content in contents:
+    #     try:
+    #         username = content.find_element_by_class_name(
+    #             'note-headline-light').text
+    #         print(username)
+    #     except:
+    #         pass
+
+    #     try:
+    #         action = content.find_element_by_class_name(
+    #             'system-note-message').find_element_by_xpath('span').text
+    #         print(action)
+    #     except:
+    #         pass
+
+    #     try:
+    #         datetime = content.find_element_by_tag_name(
+    #             'time').get_attribute('data-original-title')
+    #         print(datetime)
+    #     except:
+    #         pass
 
 
 def webdriver_login(driver, account, passwd):
@@ -241,6 +279,11 @@ if __name__ == '__main__':
     url1 = 'https://forge.channelfix.com/channelfix/channelfix/issues/1118'
     url2 = 'https://forge.channelfix.com/channelfix/channelfix/issues/1013'
     urls = [url1, url2]
-    for url in urls:
-        update_forge_data(driver, url)
+    # for url in urls:
+    #     update_forge_data(driver, url)
+    driver.get('https://forge.channelfix.com/channelfix/channelfix/issues')
+    driver.implicitly_wait(10)
+    issue_count = driver.find_element_by_id(
+        'state-all').find_element_by_class_name('badge').text.replace(',', '')
+    print(issue_count)
     driver.quit()
