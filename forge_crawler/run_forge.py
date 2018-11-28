@@ -135,73 +135,11 @@ def fetch_user_issue_list(state, assignee, author='', milestone='', label=''):
             [number, title, author, link, labels, action_info])
 
 
-def update_forge_data(driver):
-    url = 'https://forge.channelfix.com/channelfix/channelfix/issues/1118'
-    # html = sessions.get(url, headers=headers).text
-    # soup = BeautifulSoup(html, features="html.parser")
-    # contents = soup.find(
-    #     'ul', class_="main-notes-list")
-
-    # driver = webdriver.PhantomJS(
-    #     executable_path='../phantomjs/bin/phantomjs')
+def update_forge_data(driver, url):
     driver.get(url)
-    time.sleep(5)
+    driver.implicitly_wait(100)
 
-    try:
-        contents = driver.find_element_by_xpath('//*[@id="content-body"]/div[2]/div[1]/div[1]/div/div[1]/h2')
-    except:
-        contents = ''
-
-    print('>>', contents)
-
-    # for content in contents:
-    #     print(">>?????")
-    # contents = soup.find(
-    #     'ul', class_="main-notes-list").findAll(
-    #     'li', class_="timeline-entry")
-    # for content in contents:
-    #     try:
-    #         name = content.find(
-    #             'span', class_="note-header-author-name").get_text().replace(
-    #             '\n', '').replace('/', '')
-    #     except Exception as e:
-    #         name = ''
-    #     print('>>>', name)
-
-
-def webdriver_login(driver, account, passwd):
-    driver.find_element_by_id('user_login').send_keys(account)
-    driver.find_element_by_id('user_password').send_keys(passwd)
-    driver.find_element_by_class_name('btn-save').click()
-    # time.sleep(2)
-    # title = driver.find_element_by_class_name('shortcuts-activity').text
-    # try:
-    #     assert title == 'Your projects'
-    #     print('>>>>>yead!!!!')
-    #     return 'Success'
-    # except AssertionError as e:
-    #     return 'Failed!'
-
-    url = 'https://forge.channelfix.com/channelfix/channelfix/issues/1118'
-    driver.get(url)
-    # time.sleep(20)
-    driver.implicitly_wait(10)
-
-    # try:
-    #     WebDriverWait(driver, 20, 0.5)
-    #     driver.save_screenshot('3.png')
-    # finally:
-    #     driver.close()
-
-    # try:
-    #     contents = driver.find_element_by_xpath(
-    #         '//*[@id="note_68102"]/div').text
-    # except:
-    #     contents = ''
-
-    # print('>>', contents)
-
-    WebDriverWait(driver, 20).until(
+    WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((
             By.XPATH, '//*[@id="notes-list"]')))
 
@@ -223,11 +161,25 @@ def webdriver_login(driver, account, passwd):
             pass
 
         try:
-            time = content.find_element_by_tag_name(
+            datetime = content.find_element_by_tag_name(
                 'time').get_attribute('data-original-title')
-            print(time)
+            print(datetime)
         except:
             pass
+
+
+def webdriver_login(driver, account, passwd):
+    driver.find_element_by_id('user_login').send_keys(account)
+    driver.find_element_by_id('user_password').send_keys(passwd)
+    driver.find_element_by_class_name('btn-save').click()
+    time.sleep(2)
+    title = driver.find_element_by_class_name('shortcuts-activity').text
+    try:
+        assert title == 'Your projects'
+        print('Success')
+    except AssertionError as e:
+        print('Failed!')
+    return driver
 
 
 if __name__ == '__main__':
@@ -285,6 +237,10 @@ if __name__ == '__main__':
     driver = webdriver.Chrome()
     driver.get(login_url)
     driver.maximize_window()
-    webdriver_login(driver, email, password)
-    # update_forge_data(driver)
+    driver = webdriver_login(driver, email, password)
+    url1 = 'https://forge.channelfix.com/channelfix/channelfix/issues/1118'
+    url2 = 'https://forge.channelfix.com/channelfix/channelfix/issues/1013'
+    urls = [url1, url2]
+    for url in urls:
+        update_forge_data(driver, url)
     driver.quit()
