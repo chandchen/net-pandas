@@ -6,7 +6,7 @@ cssselect==1.0.3
 idna==2.7
 lxml==4.2.5
 parsel==1.5.0
-Pillow==5.3.0
+Pillow==6.2.0
 playsound==1.2.2
 pyobjc==5.0
 pyobjc-core==5.0
