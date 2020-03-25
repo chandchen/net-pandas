@@ -9,3 +9,4 @@ category.csv
 data_collection
 forge_crawler/accounts.json
 forge_crawler/search_results
+douban/results

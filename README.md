@@ -4,6 +4,8 @@
 
 **Crawler Target:** https://kolranking.com/
 
+**Crawler Target:** https://read.douban.com/category?kind=1
+
 ### Prerequisites
 
 **PhantomJS:** this allow WebDriver to fetch ajax data in the website
@@ -14,13 +16,15 @@
 
 - `pytesseract` require `tesseract-ocr` -> `sudo apt-get install tesseract-ocr`
 
+- `chromedriver` http://chromedriver.storage.googleapis.com/index.html
+
 ### Basic Installation
 
-- `git clone git@github.com:chandchen/web-robots.git`
+- `git clone git@github.com:chandchen/net-pandas.git`
 
-- `cd web-robots`
+- `cd net-pandas`
 
-- `mkvirtualenv robots -a . -p python3`
+- `mkvirtualenv -a . net-pandas -p python3.6`
 
 - `pip install -r requirements.txt`
 
