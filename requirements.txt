@@ -101,7 +101,7 @@ pyobjc-framework-VideoToolbox==5.0
 pyobjc-framework-Vision==5.0
 pyobjc-framework-WebKit==5.0
 pytesseract==0.2.5
-requests==2.19.1
+requests==2.20.0
 selenium==2.48.0
 six==1.11.0
 urllib3==1.24.2
