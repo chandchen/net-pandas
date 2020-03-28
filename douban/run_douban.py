@@ -70,6 +70,6 @@ if __name__ == '__main__':
     driver = webdriver.Chrome(
         executable_path='../chromedriver', chrome_options=options)
 
-    fetch_data(driver, target_url, 71, 80)
+    fetch_data(driver, target_url, 401, 450)
 
     driver.quit()
