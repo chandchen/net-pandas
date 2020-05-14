@@ -3,12 +3,12 @@ import requests
 import csv
 
 
-file_path = 'douban/results/books_[401-450]_202003281332.csv'
+file_path = 'douban/results/books_[901-1000]_202004011152.csv'
 
 
 def download_image(image_url, count, title):
     r = requests.get(image_url)
-    with open('douban/results/cover_[401-450]/{}-{}.jpg'.format(
+    with open('douban/results/cover_[901-1000]/{}-{}.jpg'.format(
             count, title), 'wb') as f:
         f.write(r.content)
 

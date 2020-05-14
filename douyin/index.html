@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PC HLS video</title>
+    <link href="http://cdn.bootcss.com/video.js/6.0.0-RC.5/alt/video-js-cdn.min.css" rel="stylesheet">
+    <style type="text/css">
+        .video-user {
+            bottom: 0;
+            width: 7.1rem;
+            left: .2rem;
+            z-index: 101;
+            display: block;
+            height: 4.8rem;
+            padding-top: 2.16rem;
+            border-top: .03rem solid rgba(255,255,255,.3);
+            color: #000000;
+        }
+        .user-avator {
+            float: left;
+            width: 3.6rem;
+            height: 3.6rem;
+            border-radius: 100%;
+            border: .01rem solid #fff;
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+        .user-name {
+            position: absolute;
+            padding-left: 80px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Douyin Live Streaming</h1>
+    <p><strong>Shared:</strong> https://v.douyin.com/EEx8fs/</p>
+    <p><strong>Streaming:</strong> http://pull-hls-l1.douyincdn.com/stage/stream-683125768762687518/playlist.m3u8</p>
+
+    <video id="hls-video" poster="https://p9-dy-ipv6.byteimg.com/aweme/1080x1080/30ee100078cf3497b860b.jpeg" width="600" height="400" class="video-js vjs-default-skin" playsinline webkit-playsinline
+        autoplay controls preload="auto" x-webkit-airplay="true" x5-video-player-fullscreen="true"
+        x5-video-player-typ="h5">
+        <!-- 直播的视频源 -->
+        <source src="http://pull-hls-l1.douyincdn.com/stage/stream-683125768762687518/playlist.m3u8" type="application/x-mpegURL">
+        <!-- 点播的视频源 -->
+        <!--<source src="http://devstreaming.apple.com/videos/wwdc/2015/413eflf3lrh1tyo/413/hls_vod_mvp.m3u8" type="application/x-mpegURL">-->
+    </video>
+
+    <div class="video-user">
+        <div class="user-avator" style="background-image:url(https://p26-dy.byteimg.com/aweme/100x100/30ee100078cf3497b860b.jpeg)"></div>
+        <p class="user-name">@小表弟说穿搭</p>
+    </div>
+
+    <script src="http://cdn.bootcss.com/video.js/6.0.0-RC.5/video.js"></script>
+    <!-- PC 端浏览器不支持播放 hls 文件(m3u8), 需要 videojs-contrib-hls 来给我们解码 -->
+    <script src="http://cdn.bootcss.com/videojs-contrib-hls/5.3.3/videojs-contrib-hls.js"></script>
+    <script>
+        // XMLHttpRequest cannot load http://xxx/video.m3u8. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://192.168.198.98:8000' is therefore not allowed access.
+        // 由于 videojs-contrib-hls 需要通过 XHR 来获取解析 m3u8 文件, 因此会遭遇跨域问题, 请设置浏览器运行跨域
+        var player = videojs('hls-video');
+        player.play();
+    </script>
+</body>
+
+</html>

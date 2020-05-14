@@ -3,6 +3,7 @@ import time
 import csv
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 
 csv_readers = ['标题', '作者', '简介', '评分', '评分人数', '字数', '分类', '封面']
@@ -17,7 +18,7 @@ def fetch_data(driver, target_url, start_page=1, end_page=10):
 
     for page in range(start_page, end_page + 1):
         driver.get(target_url.format(page))
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(1)
         ul = driver.find_element_by_xpath('//div[@class="section-works"]/ul')
         lis = ul.find_elements_by_xpath('li')
 
@@ -33,22 +34,15 @@ def fetch_data(driver, target_url, start_page=1, end_page=10):
                 score = extra_info.find_element_by_class_name('score').text
                 amount = extra_info.find_element_by_class_name(
                     'amount').text.replace(' 评分', '')
-            except:
+            except NoSuchElementException:
                 score = '暂无评分'
                 amount = 'N/A'
 
-            try:
-                kind = extra_info.find_element_by_class_name('kind-link').text
-            except:
-                kind = '暂无分类'
-
-            try:
-                extra_info_str = extra_info.text
-                start_index = extra_info_str.find('约')
-                end_index = extra_info_str.find('字')
-                words = extra_info_str[start_index + 2:end_index]
-            except:
-                words = '未知字数'
+            kind = extra_info.find_element_by_class_name('kind-link').text
+            extra_info_str = extra_info.text
+            start_index = extra_info_str.find('约')
+            end_index = extra_info_str.find('字')
+            words = extra_info_str[start_index + 2:end_index]
 
             cover = li.find_element_by_class_name(
                 'cover').find_element_by_tag_name('img').get_attribute("src")
@@ -70,6 +64,6 @@ if __name__ == '__main__':
     driver = webdriver.Chrome(
         executable_path='../chromedriver', chrome_options=options)
 
-    fetch_data(driver, target_url, 401, 450)
+    fetch_data(driver, target_url, 901, 1000)
 
     driver.quit()
